@@ -7,15 +7,14 @@ package com.southkart.newsapp;
 public class News {
     private String webTitle;
     private String webUrl;
-    private String apiUrl;
     private String webPublicationDate;
     private String sectionName;
 
-    public News(String webTitle, String webUrl, String apiUrl, String webPublicationDate) {
+    public News(String sectionName, String webPublicationDate, String webTitle, String webUrl ) {
         this.webTitle = webTitle;
         this.webUrl = webUrl;
-        this.apiUrl = apiUrl;
         this.webPublicationDate = webPublicationDate;
+        this.sectionName = sectionName;
     }
 
     public String getWebTitle() {
@@ -26,11 +25,11 @@ public class News {
         return webUrl;
     }
 
-    public String getApiUrl() {
-        return apiUrl;
-    }
-
     public String getWebPublicationDate() {
         return webPublicationDate;
+    }
+
+    public String getSectionName() {
+        return sectionName;
     }
 }

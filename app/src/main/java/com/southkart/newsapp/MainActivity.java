@@ -16,42 +16,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ArrayList<News> sportNews = new ArrayList<>();
-        sportNews.add(
-                new News(
-                "Nick Foles made the catch the great Tom Brady couldn't in Super Bowl LII",
-                "https://www.theguardian.com/sport/blog/2018/feb/04/nick-foles-catch-tom-brady-super-bowl-2018",
-                "https://content.guardianapis.com/sport/blog/2018/feb/04/nick-foles-catch-tom-brady-super-bowl-2018",
-                        "2018-02-05T05:26:32Z"
-
-                ));
-
-        sportNews.add(
-                new News(
-                        "Nick Foles made the catch the great Tom Brady couldn't in Super Bowl LII",
-                        "https://www.theguardian.com/sport/blog/2018/feb/04/nick-foles-catch-tom-brady-super-bowl-2018",
-                        "https://content.guardianapis.com/sport/blog/2018/feb/04/nick-foles-catch-tom-brady-super-bowl-2018",
-                        "2018-02-05T05:26:32Z"
-
-                ));
-
-        sportNews.add(
-                new News(
-                        "Nick Foles made the catch the great Tom Brady couldn't in Super Bowl LII",
-                        "https://www.theguardian.com/sport/blog/2018/feb/04/nick-foles-catch-tom-brady-super-bowl-2018",
-                        "https://content.guardianapis.com/sport/blog/2018/feb/04/nick-foles-catch-tom-brady-super-bowl-2018",
-                        "2018-02-05T05:26:32Z"
-
-                ));
-
-        sportNews.add(
-                new News(
-                        "Nick Foles made the catch the great Tom Brady couldn't in Super Bowl LII",
-                        "https://www.theguardian.com/sport/blog/2018/feb/04/nick-foles-catch-tom-brady-super-bowl-2018",
-                        "https://content.guardianapis.com/sport/blog/2018/feb/04/nick-foles-catch-tom-brady-super-bowl-2018",
-                        "2018-02-05T05:26:32Z"
-
-                ));
+        ArrayList<News> sportNews = QueryUtils.extractNews(this);
 
         ListView list = (ListView) findViewById(R.id.news_list);
 

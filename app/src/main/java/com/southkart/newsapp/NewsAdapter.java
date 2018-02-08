@@ -36,6 +36,9 @@ public class NewsAdapter extends ArrayAdapter {
         TextView webPublicationDate = (TextView) listItemView.findViewById(R.id.webPublicationDate);
         webPublicationDate.setText(currentNews.getWebPublicationDate());
 
+        TextView sectionName = (TextView) listItemView.findViewById(R.id.sectionName);
+        sectionName.setText(currentNews.getSectionName());
+
         return listItemView;
     }
 }
