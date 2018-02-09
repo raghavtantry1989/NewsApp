@@ -12,6 +12,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
@@ -26,6 +29,60 @@ public class QueryUtils {
 
     private QueryUtils(){
 
+    }
+
+    /**
+     * Returns new URL object from the given string URL.
+     */
+    private static URL createUrl(String stringUrl) {
+        URL url = null;
+        try {
+            url = new URL(stringUrl);
+        } catch (MalformedURLException e) {
+            Log.e(LOG_TAG, "Error with creating URL ", e);
+        }
+        return url;
+    }
+
+    /**
+     * Make an HTTP request to the given URL and return a String as the response.
+     */
+    private static String makeHttpRequest(URL url) throws IOException {
+        String jsonResponse = "";
+
+        if(url == null){
+            return jsonResponse;
+        }
+
+        HttpURLConnection urlConnection = null;
+        InputStream inputStream = null;
+        try {
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("GET");
+            urlConnection.setReadTimeout(10000 /* milliseconds */);
+            urlConnection.setConnectTimeout(15000 /* milliseconds */);
+            urlConnection.connect();
+            int status = urlConnection.getResponseCode();
+            if(status == 200){
+                inputStream = urlConnection.getInputStream();
+                jsonResponse = readFromStream(inputStream);
+            }else{
+                Log.e(LOG_TAG,"Status :" + status);
+            }
+
+        } catch (IOException e) {
+            // TODO: Handle the exception
+            Log.e(LOG_TAG,"IOException",e);
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+            if (inputStream != null) {
+                // function must handle java.io.IOException here
+                inputStream.close();
+            }
+        }
+        return jsonResponse;
     }
 
     /*
@@ -46,23 +103,22 @@ public class QueryUtils {
         return output.toString();
     }
 
-    public static ArrayList<News> extractNews(Context context){
+    public static ArrayList<News> extractNews(String url_string){
         // Create an empty ArrayList
         ArrayList<News> newsList = new ArrayList<>();
 
         try {
-            // Reference the Local Data File and get the data in stream
-            AssetManager manager = context.getAssets();
-            InputStream data = manager.open(SAMPLE_JSON_FILE_NAME);
+            // Convert String to URL
+            URL url = createUrl(url_string);
+
+            Log.v("URL after fetch", url_string);
 
             // Read the input stream and get the JSON response back
-            String jsonResponse = readFromStream(data);
+            String jsonResponse = makeHttpRequest(url);
+            Log.v("Data after fetch", jsonResponse);
 
             // Convert JSON String to JSON Object
-            JSONArray rootArray = new JSONArray(jsonResponse);
-
-            // Get reference to the rootObject array
-            JSONObject rootObject = rootArray.getJSONObject(0);
+            JSONObject rootObject = new JSONObject(jsonResponse);
 
             // Get reference to response Object
             JSONObject response = rootObject.getJSONObject("response");
