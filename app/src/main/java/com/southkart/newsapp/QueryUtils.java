@@ -25,7 +25,6 @@ import java.util.ArrayList;
 public class QueryUtils {
 
     private static final String LOG_TAG = QueryUtils.class.getName();
-    private static final String SAMPLE_JSON_FILE_NAME = "data.json";
 
     private QueryUtils(){
 
@@ -111,11 +110,8 @@ public class QueryUtils {
             // Convert String to URL
             URL url = createUrl(url_string);
 
-            Log.v("URL after fetch", url_string);
-
             // Read the input stream and get the JSON response back
             String jsonResponse = makeHttpRequest(url);
-            Log.v("Data after fetch", jsonResponse);
 
             // Convert JSON String to JSON Object
             JSONObject rootObject = new JSONObject(jsonResponse);
