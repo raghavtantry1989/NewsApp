@@ -15,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.net.URL;
@@ -28,6 +29,8 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<A
     private final static String URL_KEY = "&api-key=test";
     private String searchKeyWord = "debates";
     private MainActivity self = this;
+    private TextView emptyStateView;
+    private View loadingIndicator;
 
     /**
      * Constant value for the earthquake loader ID. We can choose any integer.
@@ -44,6 +47,12 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<A
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Reference of Empty Text View
+        emptyStateView = (TextView) findViewById(R.id.emptyStateView);
+
+        // Reference of the Loading Indicator
+        loadingIndicator = findViewById(R.id.loading_indicator);
 
         // Reference of the ListView
         ListView list = (ListView) findViewById(R.id.news_list);
@@ -73,10 +82,11 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<A
             public void onClick(View v) {
                 // Get the Keyword to search
                 searchKeyWord = searchText.getText().toString();
-                Log.v("String to Search", searchKeyWord);
-                Toast.makeText(getApplicationContext(),"Will perform search for "+ searchKeyWord,Toast.LENGTH_LONG).show();
-
+                loadingIndicator.setVisibility(View.VISIBLE);
                 adapter.clear();
+
+                // Hide the emptyText View
+                emptyStateView.setVisibility(View.GONE);
 
                 // Initialize the Loader
                 getLoaderManager().restartLoader(GUARDIAN_LOADER_ID, null, self);
@@ -92,19 +102,24 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<A
 
     @Override
     public Loader<ArrayList<News>> onCreateLoader(int id, Bundle args) {
-        Log.v("String to Search", searchKeyWord);
         return new GuardianDataLoader(this, URL_BASE + searchKeyWord + URL_KEY);
     }
 
     @Override
     public void onLoadFinished(Loader<ArrayList<News>> loader, ArrayList<News> newsData) {
+
+        loadingIndicator.setVisibility(View.GONE);
+
         // Update the Elements
         adapter.clear();
 
-        // If there is a valid list of {@link Earthquake}s, then add them to the adapter's
-        // data set. This will trigger the ListView to update.
+        // Check the response from server
         if (newsData != null && !newsData.isEmpty()) {
             adapter.addAll(newsData);
+        } else{
+            emptyStateView.setText(R.string.no_results);
+            // Hide the emptyText View
+            emptyStateView.setVisibility(View.VISIBLE);
         }
     }
 
