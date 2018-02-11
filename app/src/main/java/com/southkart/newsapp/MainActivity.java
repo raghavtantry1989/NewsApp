@@ -2,8 +2,11 @@ package com.southkart.newsapp;
 
 import android.app.LoaderManager.LoaderCallbacks;
 import android.app.LoaderManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -27,17 +30,21 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<A
     public static final String LOG_TAG = MainActivity.class.getName();
     private final static String URL_BASE = "http://content.guardianapis.com/search?q=";
     private final static String URL_KEY = "&api-key=test";
+
     private String searchKeyWord = "debates";
     private MainActivity self = this;
     private TextView emptyStateView;
     private View loadingIndicator;
+    private ListView list;
+
+    private ConnectivityManager connMgr;
+    private NetworkInfo networkInfo;
 
     /**
-     * Constant value for the earthquake loader ID. We can choose any integer.
+     * Constant value of loader ID. We can choose any integer.
      * This really only comes into play if you're using multiple loaders.
      */
     private static final int GUARDIAN_LOADER_ID = 1;
-
 
     private NewsAdapter adapter;
     private EditText searchText;
@@ -55,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<A
         loadingIndicator = findViewById(R.id.loading_indicator);
 
         // Reference of the ListView
-        ListView list = (ListView) findViewById(R.id.news_list);
+        list = (ListView) findViewById(R.id.news_list);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -71,8 +78,24 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<A
         searchText = (EditText) findViewById(R.id.searchText);
         searchKeyWord = searchText.getText().toString();
 
-        // Initialize the Loader
-        getLoaderManager().initLoader(GUARDIAN_LOADER_ID, null, this);
+        // Get a reference to the ConnectivityManager to check state of network connectivity
+        connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        // Get details on the currently active default data network
+        networkInfo = connMgr.getActiveNetworkInfo();
+
+        if (networkInfo != null && networkInfo.isConnected()) {
+            // Initialize the Loader
+            getLoaderManager().initLoader(GUARDIAN_LOADER_ID, null, this);
+
+        }else{
+            // First, hide loading indicator so error message will be visible
+            View loadingIndicator = findViewById(R.id.loading_indicator);
+            loadingIndicator.setVisibility(View.GONE);
+
+            // Update empty state with no connection error message
+            emptyStateView.setText(R.string.no_internet);
+        }
 
         // Reference of the Search Button
         searchBtn = (Button) findViewById(R.id.search);
@@ -82,14 +105,34 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<A
             public void onClick(View v) {
                 // Get the Keyword to search
                 searchKeyWord = searchText.getText().toString();
-                loadingIndicator.setVisibility(View.VISIBLE);
-                adapter.clear();
 
-                // Hide the emptyText View
-                emptyStateView.setVisibility(View.GONE);
+                if(searchKeyWord!=null && !searchKeyWord.isEmpty()){
+                    networkInfo = connMgr.getActiveNetworkInfo();
+                    if (networkInfo != null && networkInfo.isConnected()) {
+                        // Show the Loading Indicator
+                        loadingIndicator.setVisibility(View.VISIBLE);
 
-                // Initialize the Loader
-                getLoaderManager().restartLoader(GUARDIAN_LOADER_ID, null, self);
+                        // Hide the emptyText View
+                        emptyStateView.setVisibility(View.GONE);
+
+                        // Initialize the Loader
+                        getLoaderManager().restartLoader(GUARDIAN_LOADER_ID, null, self);
+                    }
+                    else{
+                        // Show the emptyText View
+                        emptyStateView.setVisibility(View.VISIBLE);
+
+                        // Hide the List View
+                        list.setVisibility(View.GONE);
+
+                        // Set text to No Internet
+                        emptyStateView.setText(R.string.no_internet);
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(),"Please enter a topic",Toast.LENGTH_LONG).show();
+                }
+
+
 
             }
         });
@@ -109,6 +152,8 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<A
     public void onLoadFinished(Loader<ArrayList<News>> loader, ArrayList<News> newsData) {
 
         loadingIndicator.setVisibility(View.GONE);
+        // Hide the List View
+        list.setVisibility(View.VISIBLE);
 
         // Update the Elements
         adapter.clear();

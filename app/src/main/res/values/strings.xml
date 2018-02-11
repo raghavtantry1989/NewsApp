@@ -3,4 +3,5 @@
     <string name="search">Search</string>
     <string name="no_results">No News Found</string>
     <string name="network_error">Soemthing wrong with your network Connection</string>
+    <string name="no_internet">No Internet</string>
 </resources>
