@@ -20,24 +20,35 @@ public class NewsAdapter extends ArrayAdapter {
         super(context, 0, objects);
     }
 
+    static class ViewHolder{
+        TextView webTitle;
+        TextView webPublicationDate;
+        TextView sectionName;
+    }
+
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+
+        ViewHolder holder;
         View listItemView = convertView;
         if(listItemView == null){
             listItemView = LayoutInflater.from(getContext()).inflate(R.layout.news_item,parent,false);
-        }
 
+            holder = new ViewHolder();
+            holder.webTitle = (TextView) listItemView.findViewById(R.id.webTitle);
+            holder.webPublicationDate = (TextView) listItemView.findViewById(R.id.webPublicationDate);
+            holder.sectionName = (TextView) listItemView.findViewById(R.id.sectionName);
+            listItemView.setTag(holder);
+        }
+        else{
+            holder = (ViewHolder) listItemView.getTag();
+        }
         News currentNews = (News) getItem(position);
 
-        TextView webTitle = (TextView) listItemView.findViewById(R.id.webTitle);
-        webTitle.setText(currentNews.getWebTitle());
-
-        TextView webPublicationDate = (TextView) listItemView.findViewById(R.id.webPublicationDate);
-        webPublicationDate.setText(currentNews.getWebPublicationDate());
-
-        TextView sectionName = (TextView) listItemView.findViewById(R.id.sectionName);
-        sectionName.setText(currentNews.getSectionName());
+        holder.webTitle.setText(currentNews.getWebTitle());
+        holder.webPublicationDate.setText(currentNews.getWebPublicationDate());
+        holder.sectionName.setText(currentNews.getSectionName());
 
         return listItemView;
     }
