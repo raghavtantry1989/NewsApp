@@ -25,10 +25,16 @@ import java.util.ArrayList;
 public class QueryUtils {
 
     private static final String LOG_TAG = QueryUtils.class.getName();
+    private static final int READ_TIMEOUT = 10000;
+    private static final int CONNECTION_TIMEOUT = 15000;
+    private static final int SUCCESS_STATUS_CODE = 200;
 
+
+    // An empty private constructor makes sure that the class is not going to be initialised.
     private QueryUtils(){
 
     }
+
 
     /**
      * Returns new URL object from the given string URL.
@@ -58,11 +64,11 @@ public class QueryUtils {
         try {
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
-            urlConnection.setReadTimeout(10000 /* milliseconds */);
-            urlConnection.setConnectTimeout(15000 /* milliseconds */);
+            urlConnection.setReadTimeout(READ_TIMEOUT /* milliseconds */);
+            urlConnection.setConnectTimeout(CONNECTION_TIMEOUT /* milliseconds */);
             urlConnection.connect();
             int status = urlConnection.getResponseCode();
-            if(status == 200){
+            if(status == SUCCESS_STATUS_CODE){
                 inputStream = urlConnection.getInputStream();
                 jsonResponse = readFromStream(inputStream);
             }else{
@@ -133,8 +139,17 @@ public class QueryUtils {
                 String webTitle = newsData.getString("webTitle");
                 String webUrl = newsData.getString("webUrl");
 
+                JSONArray tagsArray = newsData.getJSONArray("tags");
+                StringBuilder authors = new StringBuilder();
+
+                for(int indexOfTags = 0; indexOfTags < tagsArray.length(); indexOfTags++){
+                    JSONObject tagsObject = tagsArray.getJSONObject(indexOfTags);
+                    authors.append(tagsObject.getString("webTitle"));
+                    authors.append(" ");
+                }
+
                 // Add a news object in the arraylist
-                newsList.add(new News(sectionName,webPublicationDate,webTitle,webUrl));
+                newsList.add(new News(sectionName,webPublicationDate,webTitle,webUrl, authors.toString()));
                 Log.v(LOG_TAG,"News Added");
             }
         }

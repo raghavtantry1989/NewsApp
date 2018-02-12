@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<A
 
     public static final String LOG_TAG = MainActivity.class.getName();
     private final static String URL_BASE = "http://content.guardianapis.com/search?q=";
-    private final static String URL_KEY = "&api-key=test";
+    private final static String URL_KEY = "&api-key=test&show-tags=contributor";
 
     private String searchKeyWord = "debates";
     private MainActivity self = this;
@@ -100,47 +100,41 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<A
         // Reference of the Search Button
         searchBtn = (Button) findViewById(R.id.search);
 
-        searchBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Get the Keyword to search
-                searchKeyWord = searchText.getText().toString();
-
-                if(searchKeyWord!=null && !searchKeyWord.isEmpty()){
-                    networkInfo = connMgr.getActiveNetworkInfo();
-                    if (networkInfo != null && networkInfo.isConnected()) {
-                        // Show the Loading Indicator
-                        loadingIndicator.setVisibility(View.VISIBLE);
-
-                        // Hide the emptyText View
-                        emptyStateView.setVisibility(View.GONE);
-
-                        // Initialize the Loader
-                        getLoaderManager().restartLoader(GUARDIAN_LOADER_ID, null, self);
-                    }
-                    else{
-                        // Show the emptyText View
-                        emptyStateView.setVisibility(View.VISIBLE);
-
-                        // Hide the List View
-                        list.setVisibility(View.GONE);
-
-                        // Set text to No Internet
-                        emptyStateView.setText(R.string.no_internet);
-                    }
-                } else {
-                    Toast.makeText(getApplicationContext(),"Please enter a topic",Toast.LENGTH_LONG).show();
-                }
-
-
-
-            }
-        });
-
         // Initialize the adapter and set it to a empty list
         adapter = new NewsAdapter(getApplicationContext(),new ArrayList<News>());
         list.setAdapter(adapter);
 
+    }
+
+    public void fetchKeyword(View v){
+        // Get the Keyword to search
+        searchKeyWord = searchText.getText().toString();
+
+        if(searchKeyWord!=null && !searchKeyWord.isEmpty()){
+            networkInfo = connMgr.getActiveNetworkInfo();
+            if (networkInfo != null && networkInfo.isConnected()) {
+                // Show the Loading Indicator
+                loadingIndicator.setVisibility(View.VISIBLE);
+
+                // Hide the emptyText View
+                emptyStateView.setVisibility(View.GONE);
+
+                // Initialize the Loader
+                getLoaderManager().restartLoader(GUARDIAN_LOADER_ID, null, self);
+            }
+            else{
+                // Show the emptyText View
+                emptyStateView.setVisibility(View.VISIBLE);
+
+                // Hide the List View
+                list.setVisibility(View.GONE);
+
+                // Set text to No Internet
+                emptyStateView.setText(R.string.no_internet);
+            }
+        } else {
+            Toast.makeText(getApplicationContext(),"Please enter a topic",Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override

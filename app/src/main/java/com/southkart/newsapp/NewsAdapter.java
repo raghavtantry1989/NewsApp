@@ -24,6 +24,7 @@ public class NewsAdapter extends ArrayAdapter {
         TextView webTitle;
         TextView webPublicationDate;
         TextView sectionName;
+        TextView authorName;
     }
 
     @NonNull
@@ -39,6 +40,7 @@ public class NewsAdapter extends ArrayAdapter {
             holder.webTitle = (TextView) listItemView.findViewById(R.id.webTitle);
             holder.webPublicationDate = (TextView) listItemView.findViewById(R.id.webPublicationDate);
             holder.sectionName = (TextView) listItemView.findViewById(R.id.sectionName);
+            holder.authorName = (TextView) listItemView.findViewById(R.id.author);
             listItemView.setTag(holder);
         }
         else{
@@ -49,7 +51,7 @@ public class NewsAdapter extends ArrayAdapter {
         holder.webTitle.setText(currentNews.getWebTitle());
         holder.webPublicationDate.setText(currentNews.getWebPublicationDate());
         holder.sectionName.setText(currentNews.getSectionName());
-
+        holder.authorName.setText(currentNews.getAuthor());
         return listItemView;
     }
 }
